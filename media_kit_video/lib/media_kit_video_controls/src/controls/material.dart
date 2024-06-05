@@ -1002,7 +1002,7 @@ class _MaterialVideoControlsState extends State<_MaterialVideoControls> {
                       (
                           // Add padding in fullscreen!
                           isFullscreen(context)
-                              ? MediaQuery.of(context).padding
+                              ? EdgeInsets.symmetric(horizontal: 20)
                               : EdgeInsets.zero),
                   child: Column(
                     children: [
@@ -1799,6 +1799,43 @@ class MaterialFullscreenButton extends StatelessWidget {
           (isFullscreen(context)
               ? const Icon(Icons.fullscreen_exit)
               : const Icon(Icons.fullscreen)),
+      iconSize: iconSize ?? _theme(context).buttonBarButtonSize,
+      color: iconColor ?? _theme(context).buttonBarButtonColor,
+    );
+  }
+}
+
+class MaterialFullscreenSidebarButton extends StatelessWidget {
+  /// Icon for [MaterialFullscreenSidebarButton].
+  final Widget? icon;
+
+  /// Overriden icon size for [MaterialFullscreenSidebarButton].
+  final double? iconSize;
+
+  /// Overriden icon color for [MaterialFullscreenSidebarButton].
+  final Color? iconColor;
+
+  // slidebar widget
+  final Widget? slidebar;
+
+  const MaterialFullscreenSidebarButton({
+    Key? key,
+    this.icon,
+    this.iconSize,
+    this.iconColor,
+    this.slidebar,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () =>
+          isFullscreen(context) ? toggleSidebar(context, slidebar) : null,
+      icon: icon ??
+          (isFullscreen(context)
+              ? const Icon(Icons.widgets)
+              : const Icon(Icons.fullscreen)),
+      padding: EdgeInsets.zero,
       iconSize: iconSize ?? _theme(context).buttonBarButtonSize,
       color: iconColor ?? _theme(context).buttonBarButtonColor,
     );
