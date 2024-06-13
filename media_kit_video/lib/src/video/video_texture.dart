@@ -7,6 +7,7 @@ import 'dart:io';
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
+import 'package:media_kit_video/media_kit_video_controls/src/controls/methods/models/skip_next_button.dart';
 
 import 'package:media_kit_video/src/subtitle/subtitle_view.dart';
 import 'package:media_kit_video/media_kit_video_controls/media_kit_video_controls.dart'
@@ -169,8 +170,11 @@ class VideoState extends State<Video> with WidgetsBindingObserver {
     return media_kit_video_controls.isFullscreen(_contextNotifier.value!);
   }
 
-  Future<void> enterFullscreen() {
-    return media_kit_video_controls.enterFullscreen(_contextNotifier.value!  );
+  Future<void> enterFullscreen(
+      {List<MediaKitSkipButton> mediaSkip = const [],
+      List<MediaKitNextButton> nextButton = const []}) {
+    return media_kit_video_controls.enterFullscreen(_contextNotifier.value!,
+        mediaSkip: mediaSkip, nextButton: nextButton);
   }
 
   Future<void> exitFullscreen() {
