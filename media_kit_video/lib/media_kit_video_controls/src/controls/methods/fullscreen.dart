@@ -96,9 +96,8 @@ Future<void> enterFullscreen(BuildContext context,
                                                     onTap: () {
                                                       controllerValue.player
                                                           .seek(Duration(
-                                                              seconds: position
-                                                                      .data!
-                                                                      .inSeconds +
+                                                              seconds: skip
+                                                                      .activateOn +
                                                                   skip.skipTime));
                                                     },
                                                     child: Stack(
