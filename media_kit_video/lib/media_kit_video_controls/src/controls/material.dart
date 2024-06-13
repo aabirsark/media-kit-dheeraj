@@ -7,6 +7,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:media_kit_video/media_kit_video_controls/src/controls/methods/models/skip_next_button.dart';
 import 'package:volume_controller/volume_controller.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
@@ -1784,17 +1785,26 @@ class MaterialFullscreenButton extends StatelessWidget {
   /// Overriden icon color for [MaterialFullscreenButton].
   final Color? iconColor;
 
+  final List<MediaKitNextButton> nextButton;
+  final List<MediaKitSkipButton> skipButton;
+
   const MaterialFullscreenButton({
     Key? key,
     this.icon,
     this.iconSize,
     this.iconColor,
+    this.nextButton = const [],
+    this.skipButton = const [],
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: () => toggleFullscreen(context),
+      onPressed: () => toggleFullscreen(
+        context,
+        mediaSkip: skipButton,
+        nextButton: nextButton,
+      ),
       icon: icon ??
           (isFullscreen(context)
               ? const Icon(Icons.fullscreen_exit)

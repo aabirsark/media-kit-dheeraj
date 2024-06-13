@@ -170,7 +170,7 @@ class VideoState extends State<Video> with WidgetsBindingObserver {
   }
 
   Future<void> enterFullscreen() {
-    return media_kit_video_controls.enterFullscreen(_contextNotifier.value!);
+    return media_kit_video_controls.enterFullscreen(_contextNotifier.value!  );
   }
 
   Future<void> exitFullscreen() {

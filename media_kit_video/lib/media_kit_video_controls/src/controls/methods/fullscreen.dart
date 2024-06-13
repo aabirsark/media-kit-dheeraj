@@ -6,6 +6,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:media_kit_video/media_kit_video_controls/src/controls/methods/Slidebar_controller.dart';
+import 'package:media_kit_video/media_kit_video_controls/src/controls/methods/models/skip_next_button.dart';
+import 'package:media_kit_video/media_kit_video_controls/src/controls/widgets/animation_container.widget.dart';
 import 'package:provider/provider.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -19,7 +21,9 @@ bool isFullscreen(BuildContext context) =>
     FullscreenInheritedWidget.maybeOf(context) != null;
 
 /// Makes the [Video] present in the current [BuildContext] enter fullscreen.
-Future<void> enterFullscreen(BuildContext context) {
+Future<void> enterFullscreen(BuildContext context,
+    {List<MediaKitSkipButton> mediaSkip = const [],
+    List<MediaKitNextButton> nextButton = const []}) {
   return lock.synchronized(() async {
     if (!isFullscreen(context)) {
       if (context.mounted) {
@@ -57,11 +61,111 @@ Future<void> enterFullscreen(BuildContext context) {
                                 child: AnimatedScale(
                                   duration: const Duration(milliseconds: 100),
                                   scale: stateProv.isOpen ? 0.95 : 1.0,
-                                  child: FullScreenVideo(
-                                      controllerValue: controllerValue,
-                                      videoViewParametersNotifierValue:
-                                          videoViewParametersNotifierValue,
-                                      stateValue: stateValue),
+                                  child: Stack(
+                                    children: [
+                                      FullScreenVideo(
+                                          controllerValue: controllerValue,
+                                          videoViewParametersNotifierValue:
+                                              videoViewParametersNotifierValue,
+                                          stateValue: stateValue),
+                                      Positioned(
+                                          right: 100,
+                                          bottom: 35,
+                                          child: StreamBuilder<Duration>(
+                                              stream: controllerValue
+                                                  .player.stream.position,
+                                              builder: (context, position) {
+                                                if (!position.hasData) {
+                                                  return const SizedBox();
+                                                }
+
+                                                // Check if any skip button should be shown
+                                                List<Widget> skipWidgets = [];
+                                                skipWidgets.addAll(mediaSkip
+                                                    .where((skip) =>
+                                                        skip.enabled &&
+                                                        position.data!
+                                                                .inSeconds >=
+                                                            skip.activateOn &&
+                                                        position.data!
+                                                                .inSeconds <=
+                                                            (skip.activateOn +
+                                                                skip.duration))
+                                                    .map((skip) {
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      controllerValue.player
+                                                          .seek(Duration(
+                                                              seconds: position
+                                                                      .data!
+                                                                      .inSeconds +
+                                                                  skip.skipTime));
+                                                    },
+                                                    child: Stack(
+                                                      children: [
+                                                        AnimationContainer(
+                                                          text: skip.label,
+                                                          onPressedController:
+                                                              () {},
+                                                        ),
+                                                        Container(
+                                                          width: 120,
+                                                          height: 60,
+                                                          color: Colors
+                                                              .transparent,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }).toList());
+
+                                                final duration =
+                                                    (controllerValue
+                                                            .player
+                                                            .state
+                                                            .duration
+                                                            .inSeconds)
+                                                        .abs();
+
+                                                skipWidgets.addAll(nextButton
+                                                    .where((next) =>
+                                                        (duration -
+                                                                position.data!
+                                                                    .inSeconds) <=
+                                                            next
+                                                                .activateTimeLeft &&
+                                                        (duration -
+                                                                position.data!
+                                                                    .inSeconds) >=
+                                                            next.duration &&
+                                                        next.enabled)
+                                                    .map((next) {
+                                                  return GestureDetector(
+                                                    onTap: next.callback,
+                                                    child: Stack(
+                                                      children: [
+                                                        AnimationContainer(
+                                                          text: next.label,
+                                                          onPressedController:
+                                                              () {},
+                                                        ),
+                                                        Container(
+                                                          width: 120,
+                                                          height: 60,
+                                                          color: Colors
+                                                              .transparent,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }).toList());
+
+                                                return Stack(
+                                                  children: skipWidgets,
+                                                );
+                                              }))
+                                    ],
+                                  ),
                                 ),
                               ),
                               AnimatedContainer(
@@ -155,13 +259,14 @@ Future<void> exitFullscreen(BuildContext context) {
 }
 
 /// Toggles fullscreen for the [Video] present in the current [BuildContext].
-Future<void> toggleFullscreen(
-  BuildContext context,
-) {
+Future<void> toggleFullscreen(BuildContext context,
+    {List<MediaKitSkipButton> mediaSkip = const [],
+    List<MediaKitNextButton> nextButton = const []}) {
   if (isFullscreen(context)) {
     return exitFullscreen(context);
   } else {
-    return enterFullscreen(context);
+    return enterFullscreen(context,
+        mediaSkip: mediaSkip, nextButton: nextButton);
   }
 }
 

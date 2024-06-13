@@ -1405,7 +1405,7 @@ class MaterialDesktopVolumeButtonState
                   await controller(context).player.setVolume(0.0);
                   mute = !mute;
                 }
-
+        
                 setState(() {});
               },
               iconSize: widget.iconSize ??
@@ -1436,8 +1436,9 @@ class MaterialDesktopVolumeButtonState
               opacity: hover ? 1.0 : 0.0,
               duration: _theme(context).volumeBarTransitionDuration,
               child: AnimatedContainer(
-                width:
-                    hover ? (12.0 + (widget.sliderWidth ?? 52.0) + 18.0) : 12.0,
+                width: hover
+                    ? (12.0 + (widget.sliderWidth ?? 52.0) + 18.0)
+                    : 12.0,
                 duration: _theme(context).volumeBarTransitionDuration,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -1449,7 +1450,8 @@ class MaterialDesktopVolumeButtonState
                         child: SliderTheme(
                           data: SliderThemeData(
                             trackHeight: 1.2,
-                            inactiveTrackColor: _theme(context).volumeBarColor,
+                            inactiveTrackColor:
+                                _theme(context).volumeBarColor,
                             activeTrackColor:
                                 _theme(context).volumeBarActiveColor,
                             thumbColor: _theme(context).volumeBarThumbColor,
@@ -1467,7 +1469,9 @@ class MaterialDesktopVolumeButtonState
                             min: 0.0,
                             max: 100.0,
                             onChanged: (value) async {
-                              await controller(context).player.setVolume(value);
+                              await controller(context)
+                                  .player
+                                  .setVolume(value);
                               mute = false;
                               setState(() {});
                             },
